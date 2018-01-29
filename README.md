@@ -4,7 +4,6 @@ SADA written in Bash for Kali Linux. A fun proejct for Webapplication vulnerabil
 # Usage
 
 chmod u+x SADA.sh
-
 user@machine: ./SADA.sh
 
 # License

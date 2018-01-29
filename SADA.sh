@@ -11,7 +11,6 @@
 #             www.mtk911.cf		 #
 #                                        #
 #~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~##
-
 #MIT License
 #
 #Copyright (c) 2018 Muhammad Talha Khan
