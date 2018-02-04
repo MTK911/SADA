@@ -4,13 +4,14 @@
 #                                        #
 #    SADA Web Application Testing tool   #
 #             Written by MTK             #
-#               Ver {0.3}                #
+#               Ver {0.4}                #
 #----------------------------------------#
 #     Created by Open Source shared      #
 #            as Open source              #
 #             www.mtk911.cf		 #
 #                                        #
 #~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~##
+
 #MIT License
 #
 #Copyright (c) 2018 Muhammad Talha Khan
@@ -43,6 +44,8 @@ BW='\033[1;37m'
 UW='\033[4;37m'
 RB='\033[41m'
 NC='\033[0m'
+
+ver="0.4"
 
 control_c()
 # Catch the ctrl+c
@@ -82,8 +85,6 @@ then
 echo -ne ${G}"$LINE.$dom"${NC}
 echo ''
 echo -ne "$LINE.$dom\\n" >> subdomains
-else
-echo -ne ${NC}
 fi
 done
 main_man
@@ -273,6 +274,65 @@ echo ''
 main_man
 }
 
+# CRLF_Injection_module_automagical
+crlf_asc () {
+cat subdomains | while read -r dom
+do
+echo ''
+echo -ne ${Y}" Testing "$dom" "${NC}
+echo ''
+echo -ne ${B}"CRLF injection test"${NC}
+echo ''
+if curl -s -k -I -m 2 "$dom/%0d%0acustom_header:so_evil" | grep -q "\<custom_header: so_evil\>\|\<custom_header:so_evil\>"
+then
+echo -ne ${R}"Vulnerable"${NC}
+echo ''
+echo -ne ${Y}curl -I -s -k -m 2 "$dom/%0d%0aCustom_Header:so_evil"${NC}
+echo ''
+curl -I -s -k -m 2 "$dom/%0d%0aCustom_Header:so_evil"
+echo ''
+else
+echo -ne ${G}"Not Vulnerable"${NC}
+echo ''
+fi
+done
+
+sleep 3
+echo ''
+main_man
+}
+
+# Muggle_CRLF_Injection_module
+crlf_msc () {
+read -r -p "Enter domain name {xyz.com}: " dom
+read -r -p "Enter Sub-domain name {www}: " sub
+if [ "$sub" = '' ]; then
+sub=''
+else
+subdot=$(echo -ne $sub.)
+fi
+
+echo -ne ${B}"CRLF injection test"${NC}
+echo ''
+if curl -I -s -k -m 2 "$subdot$dom/%0d%0acustom_header:so_evil" | grep -q "\<custom_header: so_evil\>\|\<custom_header:so_evil\>"
+then
+echo -ne ${R}"Vulnerable"${NC}
+echo ''
+echo -ne ${Y}curl -I -s -k -m 2 "$subdot$dom/%0d%0aCustom_Header:so_evil"${NC}
+echo ''
+curl -I -s -k -m 2 "$subdot$dom/%0d%0aCustom_Header:so_evil"
+echo ''
+else
+echo -ne ${G}"Not Vulnerable"${NC}
+echo ''   
+fi
+sleep 3
+echo ''
+main_man
+}
+
+
+
 #Say_something_smart
 abo_ut () {
 clear
@@ -286,7 +346,7 @@ echo -ne "
 	 ${G}          _${LG}//  ${G}_${LG}////// ${G}_${LG}//  ${G}_${LG}//    ${G}_${LG}//${G}_${LG}////// ${G}_${LG}//  ${NC}
 	 ${G}    _${LG}//    ${G}_${LG}//${G}_${LG}//       ${G}_${LG}// ${G}_${LG}//   ${G}_${LG}//${G}_${LG}//       ${G}_${LG}//${NC} 
 	 ${G}      _${LG}// // ${G}_${LG}//         ${G}_${LG}//${G}_${LG}/////  ${G}_${LG}//         ${G}_${LG}//${NC}
-                                                     ${BW}${UW}Ver 0.3${NC}             
+                                                     ${BW}${UW}Ver "$ver"${NC}             
                              
        ${G}SADA${NC} created as fun project to support web vulnerability scanning.
             Valuable feedback and suggestions are always welcome 
@@ -302,15 +362,25 @@ main_man
 
 #Emergency exit here
 sh_exit () {
-clear
 
+read -r -p "Do you want to save Located subdomains?[y|n]: " ask
+if [ "$ask" == "N" ] || [ "$ask" == "n" ]; then
+echo '' > subdomains
+elif [ $ask == "Y" ] || [ $ask == "y" ]; then
+cat subdomains > report_$(date +%F-%H:%M).txt
+echo '' > subdomains
+else
+echo -ne ${R}"Wrong entry please use {Y or N}\\n"${NC}
+sh_exit
+fi
+clear
 echo -ne "        Bringing simplicity back"
 echo -ne "
 ##~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#
 #                                        #
 #    SADA Web Application Testing tool   #
 #             Written by MTK             #
-#               Ver {0.3}                #
+#               Ver {"$ver"}                #
 #----------------------------------------#
 #     Created by Open Source shared      #
 #            as Open source              #
@@ -318,14 +388,7 @@ echo -ne "
 #                                        #
 #~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~##
 
-
-
-
-
-
 "
-cat subdomains > report_$(date +%F-%H:%M).txt
-echo '' > subdomains
 exit
 }
 #FRONT_END
@@ -344,12 +407,14 @@ echo -ne "
 	 ${G}          _${LG}//  ${G}_${LG}////// ${G}_${LG}//  ${G}_${LG}//    ${G}_${LG}//${G}_${LG}////// ${G}_${LG}//  ${NC}
 	 ${G}    _${LG}//    ${G}_${LG}//${G}_${LG}//       ${G}_${LG}// ${G}_${LG}//   ${G}_${LG}//${G}_${LG}//       ${G}_${LG}//${NC} 
 	 ${G}      _${LG}// // ${G}_${LG}//         ${G}_${LG}//${G}_${LG}/////  ${G}_${LG}//         ${G}_${LG}//${NC}
-                                                     ${BW}${UW}Ver 0.3${NC}             
+                                                     ${BW}${UW}Ver "$ver"${NC}             
                              
      ${R} +-----------------------------------------------------------+${NC}
      ${R} |${NC}  1.  Subdomain finder                                     ${R}|${NC}
      ${R} |${NC}  2.  Host Header Attack tests (Located subdomains)        ${R}|${NC}
      ${R} |${NC}  3.  Host Header Attack tests (Manual)                    ${R}|${NC}
+     ${R} |${NC}  4.  CRLF Injection (Located subdomains)                  ${R}|${NC}
+     ${R} |${NC}  5.  CRLF Injection (Manual)                              ${R}|${NC}
      ${R} |${NC}  0.  About SADA                                           ${R}|${NC}
      ${R} |${NC}  q.  Quit                                                 ${R}|${NC}
      ${R} +-----------------------------------------------------------+${NC}
@@ -360,10 +425,11 @@ case $choice in
 1) sub_sc ;;
 2) hha_asc ;;
 3) hha_msc ;;
+4) crlf_asc;;
+5) crlf_msc;;
 0) abo_ut ;;
-q) sh_exit ;;
+q|Q) sh_exit ;;
 *) echo -ne ${RB}${UW}"\"$choice\"${NC} is not a valid choice"\\n; sleep 2; clear ;;
 esac
 }
-clear
 main_man

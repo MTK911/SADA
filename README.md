@@ -38,5 +38,10 @@ SOFTWARE.
 + Main menu in seprate function
 
 ### Ver 0.3
-+ Trace method test added
++ Trace method scan added
 + Save located subdomains in seprate report
+
+### Ver 0.4
++ Ask for report genration on exit
++ Bug fixes && improvements
++ CRLF injecion scan added
