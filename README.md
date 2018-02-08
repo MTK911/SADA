@@ -45,3 +45,8 @@ SOFTWARE.
 + Ask for report genration on exit
 + Bug fixes && improvements
 + CRLF injecion scan added
+
+### Ver 0.5
++ Menu optimization
++ Option Bleed scan added (Experiemental)
++ Custom list and custom subdomain names scan added

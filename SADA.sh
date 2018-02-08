@@ -4,7 +4,7 @@
 #                                        #
 #    SADA Web Application Testing tool   #
 #             Written by MTK             #
-#               Ver {0.4}                #
+#               Ver {0.5}                #
 #----------------------------------------#
 #     Created by Open Source shared      #
 #            as Open source              #
@@ -45,7 +45,7 @@ UW='\033[4;37m'
 RB='\033[41m'
 NC='\033[0m'
 
-ver="0.4"
+ver="0.5"
 
 control_c()
 # Catch the ctrl+c
@@ -68,16 +68,38 @@ read -r -p "Enter domain name {xyz.com}: " dom
 echo ''
 if ping -w 2 -q -c 1 "$dom" 2>/dev/null | grep -q 'bytes' 
 then
-echo -ne ${G}"Starting test"${NC}
-echo ''
-sub_sc_list
+sub_men
 else
 echo -ne ${R}"Domain down or doesn't exists"${NC}
 sleep 2
+sub_sc
+fi
+
+}
+
+#list_selection_menu
+sub_men () {
+echo -ne "${Y}[1]${NC} Use built-in subdomain list\\n${Y}[2]${NC} Use custom subdomain list \\n${Y}[3]${NC} Enter subdomain names to scan \\n${Y}[4]${NC} Go back to menu \\nChoose scan option [1-4]: "
+read -r sel
+if [ "$sel" = '1' ]; then
+sub_aut
+elif [ "$sel" = '2' ]; then
+sub_cust
+elif [ "$sel" = '3' ]; then
+sub_man
+elif [ "$sel" = '4' ]; then
 main_man
+else
+echo -ne ${RB}${UW}"\"$sel\"${NC} is not a valid choice\\n"
+echo ""
+echo ""
+sleep 2
+sub_men
 fi
 }
-sub_sc_list () {
+
+#All mine lists
+sub_aut () {
 cat names.txt | while read -r LINE
 do
 if ping -w 2 -q -c 1 "$LINE.$dom" 2>/dev/null | grep -q 'bytes'
@@ -87,8 +109,70 @@ echo ''
 echo -ne "$LINE.$dom\\n" >> subdomains
 fi
 done
+sleep 3
 main_man
 }
+
+#Not all mine lists
+sub_cust () {
+echo -ne "Enter custom subdomain list location [/path/to/my/list.txt]: "
+read -r  culist
+if [ ! -f "$culist" ]; then
+echo -ne ${R}"File not found!\\n"${NC}
+sub_cust
+else
+cat "$culist" | while read -r LINE
+do
+if ping -w 2 -q -c 1 "$LINE.$dom" 2>/dev/null | grep -q 'bytes'
+then
+echo -ne ${G}"$LINE.$dom"${NC}
+echo ''
+echo -ne "$LINE.$dom\\n" >> subdomains
+fi
+done
+sleep 3
+main_man
+fi
+}
+
+
+#I'll tell ye name
+sub_man () {
+
+echo "Enter subdomain names seprated by space [www mail support]: "
+read -a catch
+for LINE in ${catch[@]}
+do
+if ping -w 2 -q -c 1 "$LINE.$dom" 2>/dev/null | grep -q 'bytes'
+then
+echo -ne ${G}"$LINE.$dom"${NC}
+echo ''
+echo -ne "$LINE.$dom\\n" >> subdomains
+fi
+done
+sleep 3
+main_man
+}
+
+
+#Host_Header_Attack_Scan_Selection
+hha_s () {
+clear
+echo -ne "${Y}[1]${NC} Host Header Attack Scan (Located subdomains)\\n${Y}[2]${NC} Host Header Attack Scan (Manual) \\n${Y}[3]${NC} Go back to menu \\nChoose scan option [1-3]: "
+read -r sel
+if [ "$sel" = '1' ]; then
+hha_asc
+elif [ "$sel" = '2' ]; then
+hha_msc
+elif [ "$sel" = '3' ]; then
+main_man
+else
+echo -ne ${RB}${UW}"\"$sel\"${NC} is not a valid choice"
+sleep 2
+hha_s
+fi
+}
+
 
 #Automagical Host_Header_Attack_Scan
 hha_asc () {
@@ -274,6 +358,26 @@ echo ''
 main_man
 }
 
+# CRLF_Injection_Scan_Selection
+crlf_s () {
+clear
+echo -ne "${Y}[1]${NC} CRLF Injection Scan (Located subdomains)\\n${Y}[2]${NC} CRLF Injection Scan (Manual) \\n${Y}[3]${NC} Go back to menu \\nChoose scan option [1-3]: "
+read -r sel
+if [ "$sel" = '1' ]; then
+crlf_asc
+elif [ "$sel" = '2' ]; then
+crlf_msc
+elif [ "$sel" = '3' ]; then
+main_man
+else
+echo -ne ${RB}${UW}"\"$sel\"${NC} is not a valid choice"
+sleep 2
+crlf_s
+fi
+}
+
+
+
 # CRLF_Injection_module_automagical
 crlf_asc () {
 cat subdomains | while read -r dom
@@ -331,7 +435,26 @@ echo ''
 main_man
 }
 
+#OPTION_BLEED_SCAN {EXPERIMENTAL} (https://blog.fuzzing-project.org/60-Optionsbleed-HTTP-OPTIONS-method-can-leak-Apaches-server-memory.html)
+op_bl () {
+read -r -p "Enter domain name {xyz.com}: " dom
+read -r -p "Enter Sub-domain name {www}: " sub
+if [ "$sub" = '' ]; then
+sub=''
+else
+subdot=$(echo -ne $sub.)
+fi
 
+echo -ne ${B}"Option Bleed test experimental"${NC}
+echo ''
+
+for i in {1..100}; do curl -sI -X OPTIONS $subdot$dom/|grep -i "allow:"; done
+
+sleep 5
+echo ''
+main_man
+
+}
 
 #Say_something_smart
 abo_ut () {
@@ -411,10 +534,9 @@ echo -ne "
                              
      ${R} +-----------------------------------------------------------+${NC}
      ${R} |${NC}  1.  Subdomain finder                                     ${R}|${NC}
-     ${R} |${NC}  2.  Host Header Attack tests (Located subdomains)        ${R}|${NC}
-     ${R} |${NC}  3.  Host Header Attack tests (Manual)                    ${R}|${NC}
-     ${R} |${NC}  4.  CRLF Injection (Located subdomains)                  ${R}|${NC}
-     ${R} |${NC}  5.  CRLF Injection (Manual)                              ${R}|${NC}
+     ${R} |${NC}  2.  Host Header Attack Scan                              ${R}|${NC}
+     ${R} |${NC}  3.  CRLF Injection Scan                                  ${R}|${NC}
+     ${R} |${NC}  4.  Option Bleed Scan (Experimental)                     ${R}|${NC}
      ${R} |${NC}  0.  About SADA                                           ${R}|${NC}
      ${R} |${NC}  q.  Quit                                                 ${R}|${NC}
      ${R} +-----------------------------------------------------------+${NC}
@@ -423,10 +545,9 @@ echo -ne "
 read -r -p "[-] (Your choice?):" choice
 case $choice in
 1) sub_sc ;;
-2) hha_asc ;;
-3) hha_msc ;;
-4) crlf_asc;;
-5) crlf_msc;;
+2) hha_s ;;
+3) crlf_s;;
+4) op_bl;;
 0) abo_ut ;;
 q|Q) sh_exit ;;
 *) echo -ne ${RB}${UW}"\"$choice\"${NC} is not a valid choice"\\n; sleep 2; clear ;;
