@@ -158,13 +158,15 @@ main_man
 #Host_Header_Attack_Scan_Selection
 hha_s () {
 clear
-echo -ne "${Y}[1]${NC} Host Header Attack Scan (Located subdomains)\\n${Y}[2]${NC} Host Header Attack Scan (Manual) \\n${Y}[3]${NC} Go back to menu \\nChoose scan option [1-3]: "
+echo -ne "${Y}[1]${NC} Host Header Attack Scan (Located subdomains)\\n${Y}[2]${NC} Host Header Attack Scan (Manual Single) \\n${Y}[3]${NC} Host Header Attack Scan (Manual List)\\n${Y}[4]${NC} Go back to menu \\nChoose scan option [1-4]: "
 read -r sel
 if [ "$sel" = '1' ]; then
 hha_asc
 elif [ "$sel" = '2' ]; then
 hha_msc
 elif [ "$sel" = '3' ]; then
+hha_mli
+elif [ "$sel" = '4' ]; then
 main_man
 else
 echo -ne ${RB}${UW}"\"$sel\"${NC} is not a valid choice"
@@ -358,16 +360,117 @@ echo ''
 main_man
 }
 
+#Host_header_lists belong to me
+hha_mli () {
+
+echo -ne "Enter custom subdomain list location [/path/to/my/list.txt]: "
+read -r  culist
+if [ ! -f "$culist" ]; then
+echo -ne ${R}"File not found!\\n"${NC}
+hha_mli
+else
+cat "$culist" | while read -r dom
+do
+echo ''
+echo -ne ${Y}" Testing "$dom" "${NC}
+echo ''
+echo -ne ${B}"X-Forwaded-Host link pollution test"${NC}
+echo ''
+if curl -s -k -m 2 -H "Host: "$dom"" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
+then
+echo -ne ${R}"Vulnerable"${NC}
+echo ''
+echo -ne ${Y}"curl -s -k -m 2 -H 'Host: "$dom"' -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
+echo ''
+curl -s -k -m 2 -H "Host: "$dom"" -H "X-Forwarded-Host: evil.com" "$dom"
+echo ''
+else
+echo -ne ${G}"Not Vulnerable"${NC}
+echo ''   
+fi
+
+
+echo -ne ${B}"X-Forwaded-Host header test"${NC}
+echo ''
+if curl -s -k -I -m 2 -H "Host: "$dom"" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
+then
+echo ''
+echo -ne ${R}"Vulnerable"${NC}
+echo ''
+echo -ne ${Y}"curl -s -k -I -m 2 -H 'Host: "$dom"' -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
+echo ''
+curl -s -k -I -m 2 -H "Host: "$dom"" -H "X-Forwarded-Host: evil.com" "$dom"
+echo ''
+else
+echo -ne ${G}"Not Vulnerable"${NC}
+echo ''   
+fi
+
+
+echo -ne ${B}"Host header attack link pollution test"${NC}
+echo ''
+if curl -s -k -m 2 -H "Host: evil.com" "$dom" | grep -q 'evil'
+then
+echo -ne ${R}"Vulnerable"${NC}
+echo ''
+echo -ne ${Y}"curl -s -k -m 2 -H 'Host: evil.com' "$dom""${NC}
+echo ''
+curl -s -k -m 2 -H "Host: evil.com" "$dom"
+echo ''
+else
+echo -ne ${G}"Not Vulnerable"${NC}
+echo ''   
+fi
+
+echo -ne ${B}"Host Header attack header test"${NC}
+echo ''
+if curl -s -k -I -m 2 -H "Host: evil.com" "$dom" | grep -q 'evil'
+then
+echo -ne ${R}"Vulnerable"${NC}
+echo ''
+echo -ne ${Y}"curl -s -k -I -m 2 -H 'Host: evil.com' "$dom""${NC}
+echo ''
+curl -s -k -I -m 2 -H "Host: evil.com" "$dom" 
+else
+echo -ne ${G}"Not Vulnerable"${NC}
+echo ''   
+fi
+
+
+echo -ne ${B}"Trace method test (XST)"${NC}
+echo ''
+if curl -s -I -m 2 -X TRACE "$dom" | grep -q '200 OK'
+then
+echo ''
+echo -ne ${R}"Vulnerable"${NC}
+echo ''
+echo -ne ${Y}"curl -s -I -m 2 -X TRACE "$dom""${NC}
+echo ''
+curl -s -I -m 2 -X TRACE "$dom"
+echo ''
+else
+echo -ne ${G}"Not Vulnerable"${NC}
+echo ''   
+fi
+sleep 3
+
+done
+main_man
+fi
+}
+
 # CRLF_Injection_Scan_Selection
 crlf_s () {
 clear
-echo -ne "${Y}[1]${NC} CRLF Injection Scan (Located subdomains)\\n${Y}[2]${NC} CRLF Injection Scan (Manual) \\n${Y}[3]${NC} Go back to menu \\nChoose scan option [1-3]: "
+echo -ne "${Y}[1]${NC} CRLF Injection Scan (Located subdomains)\\n${Y}[2]${NC} CRLF Injection Scan (Manual Single) \\n${Y}[3]${NC} CRLF Injection Scan (Manual List) \\n${Y}[4]${NC} Go back to menu \\nChoose scan option [1-4]: "
 read -r sel
 if [ "$sel" = '1' ]; then
 crlf_asc
 elif [ "$sel" = '2' ]; then
 crlf_msc
 elif [ "$sel" = '3' ]; then
+crlf_mli
+elif [ "$sel" = '4' ]; then
 main_man
 else
 echo -ne ${RB}${UW}"\"$sel\"${NC} is not a valid choice"
@@ -375,7 +478,6 @@ sleep 2
 crlf_s
 fi
 }
-
 
 
 # CRLF_Injection_module_automagical
@@ -434,6 +536,44 @@ sleep 3
 echo ''
 main_man
 }
+
+
+#Me_list_Crlf
+crlf_mli () {
+
+echo -ne "Enter custom subdomain list location [/path/to/my/list.txt]: "
+read -r  culist
+if [ ! -f "$culist" ]; then
+echo -ne ${R}"File not found!\\n"${NC}
+crlf_mli
+else
+cat "$culist" | while read -r dom
+do
+echo ''
+echo -ne ${Y}" Testing "$dom" "${NC}
+echo ''
+echo -ne ${B}"CRLF injection test"${NC}
+echo ''
+if curl -s -k -I -m 2 "$dom/%0d%0acustom_header:so_evil" | grep -q "\<custom_header: so_evil\>\|\<custom_header:so_evil\>"
+then
+echo -ne ${R}"Vulnerable"${NC}
+echo ''
+echo -ne ${Y}curl -I -s -k -m 2 "$dom/%0d%0aCustom_Header:so_evil"${NC}
+echo ''
+curl -I -s -k -m 2 "$dom/%0d%0aCustom_Header:so_evil"
+echo ''
+else
+echo -ne ${G}"Not Vulnerable"${NC}
+echo ''
+fi
+done
+
+sleep 3
+echo ''
+main_man
+fi
+}
+
 
 #OPTION_BLEED_SCAN {EXPERIMENTAL} (https://blog.fuzzing-project.org/60-Optionsbleed-HTTP-OPTIONS-method-can-leak-Apaches-server-memory.html)
 op_bl () {
