@@ -30,6 +30,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+# DISCLAIMER
+This software/script/application/thing is provided as is, without warranty of any kind. Use of this software/script/application/thing is entirely at your own risk. Scanning/Sending traffic somewhere where you shouldn't be or without permission of the owner is illegal. Creator of this software/script/application/thing is not responsible for any direct or indirect damage to your own or defiantly someone else's property resulting from the use of this software/script/application/thing.
+
 # Changes
 ### Ver 0.2
 + Bug fixes
@@ -51,3 +54,8 @@ SOFTWARE.
 + Menu optimization
 + Option Bleed scan added (Experiemental)
 + Custom list and custom subdomain names scan added
+
+### Ver 0.6
++ Bug fixes
++ Studpid fixes
++ Custom User Agent

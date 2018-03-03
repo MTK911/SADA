@@ -4,7 +4,7 @@
 #                                        #
 #    SADA Web Application Testing tool   #
 #             Written by MTK             #
-#               Ver {0.5}                #
+#               Ver {0.6}                #
 #----------------------------------------#
 #     Created by Open Source shared      #
 #            as Open source              #
@@ -34,6 +34,10 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #SOFTWARE.
 
+#DISCLAIMER 
+
+#This software/script/application/thing is provided as is, without warranty of any kind. Use of this software/script/application/thing is entirely at #your own risk. Scanning/Sending traffic somewhere where you shouldn't be or without permission of the owner is illegal. Creator of this software/script/application/thing is not responsible for any direct or indirect damage to your own or defiantly someone else's property resulting from the use of this software/script/application/thing.
+
 #because colors
 R='\033[0;31m'
 G='\033[0;32m'
@@ -45,13 +49,16 @@ UW='\033[4;37m'
 RB='\033[41m'
 NC='\033[0m'
 
-ver="0.5"
+ver="0.6"
+
+user_agent="SADA-$ver(https://github.com/MTK911/SADA)"
 
 control_c()
 # Catch the ctrl+c
 {
   echo ''
   echo -ne "Ctrl+c detected falling back\\n"
+  exec "$0"
   main_man
 }
  
@@ -72,7 +79,18 @@ sub_men
 else
 echo -ne ${R}"Domain down or doesn't exists"${NC}
 sleep 2
+echo ''
+echo -ne ${Y}"Do you still want to proceed with scan {Y|N}: "${NC}
+read -r go_no
+if [ "$go_no" == "N" ] || [ "$go_no" == "n" ]; then
+main_man
+elif [ $go_no == "Y" ] || [ $go_no == "y" ]; then
+sub_men
+else
+echo -ne ${R}"Wrong entry please use {Y or N}\\n"${NC}
 sub_sc
+#well_shit
+fi
 fi
 
 }
@@ -185,13 +203,13 @@ echo -ne ${Y}" Testing "$dom" "${NC}
 echo ''
 echo -ne ${B}"X-Forwaded-Host link pollution test"${NC}
 echo ''
-if curl -s -k -m 2 -H "Host: "$dom"" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -m 2 -H 'Host: "$dom"' -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -m 2 -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -m 2 -H "Host: "$dom"" -H "X-Forwarded-Host: evil.com" "$dom"
+curl -s -k -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -201,14 +219,14 @@ fi
 
 echo -ne ${B}"X-Forwaded-Host header test"${NC}
 echo ''
-if curl -s -k -I -m 2 -H "Host: "$dom"" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -I -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo ''
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -I -m 2 -H 'Host: "$dom"' -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -I -m 2 -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -I -m 2 -H "Host: "$dom"" -H "X-Forwarded-Host: evil.com" "$dom"
+curl -s -k -I -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -218,13 +236,13 @@ fi
 
 echo -ne ${B}"Host header attack link pollution test"${NC}
 echo ''
-if curl -s -k -m 2 -H "Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -m 2 -A "$user_agent" -H "Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -m 2 -H 'Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -m 2 -A "$user_agent" -H 'Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -m 2 -H "Host: evil.com" "$dom"
+curl -s -k -m 2 -A "$user_agent" -H "Host: evil.com" "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -233,13 +251,13 @@ fi
 
 echo -ne ${B}"Host Header attack header test"${NC}
 echo ''
-if curl -s -k -I -m 2 -H "Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -I -m 2 -A "$user_agent" -H "Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -I -m 2 -H 'Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -I -m 2 -A "$user_agent" -H 'Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -I -m 2 -H "Host: evil.com" "$dom" 
+curl -s -k -I -m 2 -A "$user_agent" -H "Host: evil.com" "$dom" 
 else
 echo -ne ${G}"Not Vulnerable"${NC}
 echo ''   
@@ -248,14 +266,14 @@ fi
 
 echo -ne ${B}"Trace method test (XST)"${NC}
 echo ''
-if curl -s -I -m 2 -X TRACE "$dom" | grep -q '200 OK'
+if curl -s -I -m 2 -A "$user_agent" -X TRACE "$dom" | grep -q '200 OK'
 then
 echo ''
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -I -m 2 -X TRACE "$dom""${NC}
+echo -ne ${Y}"curl -s -I -m 2 -A "$user_agent" -X TRACE "$dom""${NC}
 echo ''
-curl -s -I -m 2 -X TRACE "$dom"
+curl -s -I -m 2 -A "$user_agent" -X TRACE "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -279,13 +297,13 @@ fi
 
 echo -ne ${B}"X-Forwaded-Host link pollution test"${NC}
 echo ''
-if curl -s -k -m 2 -H "Host: "$subdot$dom"" -H "X-Forwarded-Host: evil.com" "$subdot$dom" | grep -q 'evil'
+if curl -s -k -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$subdot$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -m 2 -H 'Host: "$subdot$dom"' -H 'X-Forwarded-Host: evil.com' "$subdot$dom""${NC}
+echo -ne ${Y}"curl -s -k -m 2 -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$subdot$dom""${NC}
 echo ''
-curl -s -k -m 2 -H "Host: "$subdot$dom"" -H "X-Forwarded-Host: evil.com" "$subdot$dom"
+curl -s -k -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$subdot$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -295,14 +313,14 @@ fi
 
 echo -ne ${B}"X-Forwaded-Host header test"${NC}
 echo ''
-if curl -s -k -I -m 2 -H "Host: "$subdot$dom"" -H "X-Forwarded-Host: evil.com" "$subdot$dom" | grep -q 'evil'
+if curl -s -k -I -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$subdot$dom" | grep -q 'evil'
 then
 echo ''
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -I -m 2 -H 'Host: "$subdot$dom"' -H 'X-Forwarded-Host: evil.com' "$subdot$dom""${NC}
+echo -ne ${Y}"curl -s -k -I -m 2 -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$subdot$dom""${NC}
 echo ''
-curl -s -k -I -m 2 -H "Host: "$subdot$dom"" -H "X-Forwarded-Host: evil.com" "$subdot$dom"
+curl -s -k -I -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$subdot$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -312,13 +330,13 @@ fi
 
 echo -ne ${B}"Host header attack link pollution test"${NC}
 echo ''
-if curl -s -k -m 2 -H "Host: evil.com" "$subdot$dom" | grep -q 'evil'
+if curl -s -k -m 2 -A "$user_agent" -H "Host: evil.com" "$subdot$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -m 2 -H 'Host: evil.com' "$subdot$dom""${NC}
+echo -ne ${Y}"curl -s -k -m 2 -A "$user_agent" -H 'Host: evil.com' "$subdot$dom""${NC}
 echo ''
-curl -s -k -m 2 -H "Host: evil.com" "$subdot$dom"
+curl -s -k -m 2 -A "$user_agent" -H "Host: evil.com" "$subdot$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -328,13 +346,13 @@ fi
 
 echo -ne ${B}"Host Header attack header test"${NC}
 echo ''
-if curl -s -k -I -m 2 -H "Host: evil.com" "$subdot$dom" | grep -q 'evil'
+if curl -s -k -I -m 2 -A "$user_agent" -H "Host: evil.com" "$subdot$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -I -m 2 -H 'Host: evil.com' "$subdot$dom""${NC}
+echo -ne ${Y}"curl -s -k -I -m 2 -A "$user_agent" -H 'Host: evil.com' "$subdot$dom""${NC}
 echo ''
-curl -s -k -I -m 2 -H "Host: evil.com" "$subdot$dom" 
+curl -s -k -I -m 2 -A "$user_agent" -H "Host: evil.com" "$subdot$dom" 
 else
 echo -ne ${G}"Not Vulnerable"${NC}
 echo ''   
@@ -342,14 +360,14 @@ fi
 
 echo -ne ${B}"Trace method test (XST)"${NC}
 echo ''
-if curl -s -I -m 2 -X TRACE "$subdot$dom" | grep -q '200 OK'
+if curl -s -I -m 2 -A "$user_agent" -X TRACE "$subdot$dom" | grep -q '200 OK'
 then
 echo ''
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -I -m 2 -X TRACE "$subdot$dom""${NC}
+echo -ne ${Y}"curl -s -I -m 2 -A "$user_agent" -X TRACE "$subdot$dom""${NC}
 echo ''
-curl -s -I -m 2 -X TRACE "$subdot$dom"
+curl -s -I -m 2 -A "$user_agent" -X TRACE "$subdot$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -376,13 +394,13 @@ echo -ne ${Y}" Testing "$dom" "${NC}
 echo ''
 echo -ne ${B}"X-Forwaded-Host link pollution test"${NC}
 echo ''
-if curl -s -k -m 2 -H "Host: "$dom"" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -m 2 -H 'Host: "$dom"' -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -m 2 -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -m 2 -H "Host: "$dom"" -H "X-Forwarded-Host: evil.com" "$dom"
+curl -s -k -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -392,14 +410,14 @@ fi
 
 echo -ne ${B}"X-Forwaded-Host header test"${NC}
 echo ''
-if curl -s -k -I -m 2 -H "Host: "$dom"" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -I -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo ''
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -I -m 2 -H 'Host: "$dom"' -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -I -m 2 -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -I -m 2 -H "Host: "$dom"" -H "X-Forwarded-Host: evil.com" "$dom"
+curl -s -k -I -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -409,13 +427,13 @@ fi
 
 echo -ne ${B}"Host header attack link pollution test"${NC}
 echo ''
-if curl -s -k -m 2 -H "Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -m 2 -A "$user_agent" -H "Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -m 2 -H 'Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -m 2 -A "$user_agent" -H 'Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -m 2 -H "Host: evil.com" "$dom"
+curl -s -k -m 2 -A "$user_agent" -H "Host: evil.com" "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -424,13 +442,13 @@ fi
 
 echo -ne ${B}"Host Header attack header test"${NC}
 echo ''
-if curl -s -k -I -m 2 -H "Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -I -m 2 -A "$user_agent" -H "Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -I -m 2 -H 'Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -I -m 2 -A "$user_agent" -H 'Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -I -m 2 -H "Host: evil.com" "$dom" 
+curl -s -k -I -m 2 -A "$user_agent" -H "Host: evil.com" "$dom" 
 else
 echo -ne ${G}"Not Vulnerable"${NC}
 echo ''   
@@ -439,14 +457,14 @@ fi
 
 echo -ne ${B}"Trace method test (XST)"${NC}
 echo ''
-if curl -s -I -m 2 -X TRACE "$dom" | grep -q '200 OK'
+if curl -s -I -m 2 -A "$user_agent" -X TRACE "$dom" | grep -q '200 OK'
 then
 echo ''
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -I -m 2 -X TRACE "$dom""${NC}
+echo -ne ${Y}"curl -s -I -m 2 -A "$user_agent" -X TRACE "$dom""${NC}
 echo ''
-curl -s -I -m 2 -X TRACE "$dom"
+curl -s -I -m 2 -A "$user_agent" -X TRACE "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -489,13 +507,13 @@ echo -ne ${Y}" Testing "$dom" "${NC}
 echo ''
 echo -ne ${B}"CRLF injection test"${NC}
 echo ''
-if curl -s -k -I -m 2 "$dom/%0d%0acustom_header:so_evil" | grep -q "\<custom_header: so_evil\>\|\<custom_header:so_evil\>"
+if curl -s -k -I -m 2 -A "$user_agent" "$dom/%0d%0acustom_header:so_evil" | grep -q "\<custom_header: so_evil\>\|\<custom_header:so_evil\>"
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}curl -I -s -k -m 2 "$dom/%0d%0aCustom_Header:so_evil"${NC}
+echo -ne ${Y}curl -I -s -k -m 2 -A "$user_agent" "$dom/%0d%0aCustom_Header:so_evil"${NC}
 echo ''
-curl -I -s -k -m 2 "$dom/%0d%0aCustom_Header:so_evil"
+curl -I -s -k -m 2 -A "$user_agent" "$dom/%0d%0aCustom_Header:so_evil"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -520,13 +538,13 @@ fi
 
 echo -ne ${B}"CRLF injection test"${NC}
 echo ''
-if curl -I -s -k -m 2 "$subdot$dom/%0d%0acustom_header:so_evil" | grep -q "\<custom_header: so_evil\>\|\<custom_header:so_evil\>"
+if curl -I -s -k -m 2 -A "$user_agent" "$subdot$dom/%0d%0acustom_header:so_evil" | grep -q "\<custom_header: so_evil\>\|\<custom_header:so_evil\>"
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}curl -I -s -k -m 2 "$subdot$dom/%0d%0aCustom_Header:so_evil"${NC}
+echo -ne ${Y}curl -I -s -k -m 2 -A "$user_agent" "$subdot$dom/%0d%0aCustom_Header:so_evil"${NC}
 echo ''
-curl -I -s -k -m 2 "$subdot$dom/%0d%0aCustom_Header:so_evil"
+curl -I -s -k -m 2 -A "$user_agent" "$subdot$dom/%0d%0aCustom_Header:so_evil"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -554,13 +572,13 @@ echo -ne ${Y}" Testing "$dom" "${NC}
 echo ''
 echo -ne ${B}"CRLF injection test"${NC}
 echo ''
-if curl -s -k -I -m 2 "$dom/%0d%0acustom_header:so_evil" | grep -q "\<custom_header: so_evil\>\|\<custom_header:so_evil\>"
+if curl -s -k -I -m 2 -A "$user_agent" "$dom/%0d%0acustom_header:so_evil" | grep -q "\<custom_header: so_evil\>\|\<custom_header:so_evil\>"
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}curl -I -s -k -m 2 "$dom/%0d%0aCustom_Header:so_evil"${NC}
+echo -ne ${Y}curl -I -s -k -m 2 -A "$user_agent" "$dom/%0d%0aCustom_Header:so_evil"${NC}
 echo ''
-curl -I -s -k -m 2 "$dom/%0d%0aCustom_Header:so_evil"
+curl -I -s -k -m 2 -A "$user_agent" "$dom/%0d%0aCustom_Header:so_evil"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -588,13 +606,34 @@ fi
 echo -ne ${B}"Option Bleed test experimental"${NC}
 echo ''
 
-for i in {1..100}; do curl -sI -X OPTIONS $subdot$dom/|grep -i "allow:"; done
+for i in {1..100}; do curl -sI -A "$user_agent" -X OPTIONS $subdot$dom/|grep -i "allow:"; done
 
 sleep 5
 echo ''
 main_man
 
 }
+
+
+#Adjusting_Scanning_Options_because_not_everybody_is_a_fan_of_curl
+sc_op () {
+echo "Current User-Agent $user_agent"
+read -r -p "Would you like to change that? {Y|N}: " agask
+if [ "$agask" == "N" ] || [ "$agask" == "n" ]; then
+main_man
+elif [ $agask == "Y" ] || [ $agask == "y" ]; then
+read -r -p "Please enter your custom User-Agent: " user_agent
+echo -ne ${G}"New User-Agent $user_agent"
+sleep 3
+main_man
+else
+echo -ne ${R}"Wrong entry please use {Y or N}\\n"${NC}
+sc_op
+fi
+clear
+}
+
+
 
 #Say_something_smart
 abo_ut () {
@@ -614,6 +653,7 @@ echo -ne "
        ${G}SADA${NC} created as fun project to support web vulnerability scanning.
             Valuable feedback and suggestions are always welcome 
                  @ ${R}mtk_911@yahoo.com${NC} or ${R}http://fb.com/MTK911${NC}"
+
 echo ""
 echo ""
 echo ""
@@ -677,6 +717,7 @@ echo -ne "
      ${R} |${NC}  2.  Host Header Attack Scan                              ${R}|${NC}
      ${R} |${NC}  3.  CRLF Injection Scan                                  ${R}|${NC}
      ${R} |${NC}  4.  Option Bleed Scan (Experimental)                     ${R}|${NC}
+     ${R} |${NC}  5.  Scanning Option                                      ${R}|${NC}
      ${R} |${NC}  0.  About SADA                                           ${R}|${NC}
      ${R} |${NC}  q.  Quit                                                 ${R}|${NC}
      ${R} +-----------------------------------------------------------+${NC}
@@ -688,9 +729,11 @@ case $choice in
 2) hha_s ;;
 3) crlf_s;;
 4) op_bl;;
+5) sc_op;;
 0) abo_ut ;;
 q|Q) sh_exit ;;
 *) echo -ne ${RB}${UW}"\"$choice\"${NC} is not a valid choice"\\n; sleep 2; clear ;;
 esac
+main_man
 }
 main_man
