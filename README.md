@@ -1,5 +1,5 @@
 # SADA
-SADA written in Bash for Kali Linux. A fun proejct for Webapplication vulnerability Scanning.
+SADA written in Bash for Kali Linux. A fun project for Webapplication vulnerability Scanning.
 
 # Usage
 
@@ -13,7 +13,7 @@ MIT License
 Copyright (c) 2018 Muhammad Talha Khan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
+Of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
@@ -23,8 +23,8 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF INTERCHANGEABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -39,23 +39,26 @@ This software/script/application/thing is provided as is, without warranty of an
 + Dead or Alive host check before scan
 + Added timeout on scans
 + Changes in about
-+ Main menu in seprate function
++ Main menu in separate function
 
 ### Ver 0.3
 + Trace method scan added
-+ Save located subdomains in seprate report
++ Save located subdomains in separate report
 
 ### Ver 0.4
-+ Ask for report genration on exit
++ Ask for report generation on exit
 + Bug fixes && improvements
-+ CRLF injecion scan added
++ CRLF injection scan added
 
 ### Ver 0.5
 + Menu optimization
-+ Option Bleed scan added (Experiemental)
++ Option Bleed scan added (Experimental)
 + Custom list and custom subdomain names scan added
 
 ### Ver 0.6
 + Bug fixes
-+ Studpid fixes
++ Stupid fixes
 + Custom User Agent
++ Custom timeout
++ Beautified
++ HTTPS support added (partial)

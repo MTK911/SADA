@@ -52,6 +52,7 @@ NC='\033[0m'
 ver="0.6"
 
 user_agent="SADA-$ver(https://github.com/MTK911/SADA)"
+t_o="2"
 
 control_c()
 # Catch the ctrl+c
@@ -71,16 +72,16 @@ trap control_c SIGINT
 sub_sc () {
 clear
 #dead_or_alive
-read -r -p "Enter domain name {xyz.com}: " dom
+echo -ne "Enter domain name {${Y}xyz.com${NC}}: "
+read -r dom
 echo ''
 if ping -w 2 -q -c 1 "$dom" 2>/dev/null | grep -q 'bytes' 
 then
 sub_men
 else
 echo -ne ${R}"Domain down or doesn't exists"${NC}
-sleep 2
 echo ''
-echo -ne ${Y}"Do you still want to proceed with scan {Y|N}: "${NC}
+echo -ne "Do you still want to proceed with scan ${Y}{Y|N}: "${NC}
 read -r go_no
 if [ "$go_no" == "N" ] || [ "$go_no" == "n" ]; then
 main_man
@@ -97,7 +98,7 @@ fi
 
 #list_selection_menu
 sub_men () {
-echo -ne "${Y}[1]${NC} Use built-in subdomain list\\n${Y}[2]${NC} Use custom subdomain list \\n${Y}[3]${NC} Enter subdomain names to scan \\n${Y}[4]${NC} Go back to menu \\nChoose scan option [1-4]: "
+echo -ne "${Y}[1]${NC} Use built-in subdomain list\\n${Y}[2]${NC} Use custom subdomain list \\n${Y}[3]${NC} Enter subdomain names to scan \\n${Y}[4]${NC} Change target domain \\n${Y}[5]${NC} Go back to menu \\nChoose scan option ${Y}[1-5]${NC}: "
 read -r sel
 if [ "$sel" = '1' ]; then
 sub_aut
@@ -106,6 +107,8 @@ sub_cust
 elif [ "$sel" = '3' ]; then
 sub_man
 elif [ "$sel" = '4' ]; then
+sub_sc
+elif [ "$sel" = '5' ]; then
 main_man
 else
 echo -ne ${RB}${UW}"\"$sel\"${NC} is not a valid choice\\n"
@@ -133,7 +136,7 @@ main_man
 
 #Not all mine lists
 sub_cust () {
-echo -ne "Enter custom subdomain list location [/path/to/my/list.txt]: "
+echo -ne "Enter custom subdomain list location [${Y}/path/to/my/list.txt${NC}]: "
 read -r  culist
 if [ ! -f "$culist" ]; then
 echo -ne ${R}"File not found!\\n"${NC}
@@ -157,7 +160,7 @@ fi
 #I'll tell ye name
 sub_man () {
 
-echo "Enter subdomain names seprated by space [www mail support]: "
+echo -ne "Enter subdomain names seprated by space [${Y}www mail support${NC}]: "
 read -a catch
 for LINE in ${catch[@]}
 do
@@ -176,7 +179,7 @@ main_man
 #Host_Header_Attack_Scan_Selection
 hha_s () {
 clear
-echo -ne "${Y}[1]${NC} Host Header Attack Scan (Located subdomains)\\n${Y}[2]${NC} Host Header Attack Scan (Manual Single) \\n${Y}[3]${NC} Host Header Attack Scan (Manual List)\\n${Y}[4]${NC} Go back to menu \\nChoose scan option [1-4]: "
+echo -ne "${Y}[1]${NC} Host Header Attack Scan (Located subdomains)\\n${Y}[2]${NC} Host Header Attack Scan (Manual Single) \\n${Y}[3]${NC} Host Header Attack Scan (Manual List)\\n${Y}[4]${NC} Go back to menu \\nChoose scan option ${Y}[1-4]${NC}: "
 read -r sel
 if [ "$sel" = '1' ]; then
 hha_asc
@@ -203,13 +206,13 @@ echo -ne ${Y}" Testing "$dom" "${NC}
 echo ''
 echo -ne ${B}"X-Forwaded-Host link pollution test"${NC}
 echo ''
-if curl -s -k -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -m "$t_o" -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -m 2 -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -m "$t_o" -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom"
+curl -s -k -m "$t_o" -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -219,14 +222,14 @@ fi
 
 echo -ne ${B}"X-Forwaded-Host header test"${NC}
 echo ''
-if curl -s -k -I -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -I -m "$t_o" -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo ''
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -I -m 2 -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -I -m "$t_o" -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -I -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom"
+curl -s -k -I -m "$t_o" -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -236,13 +239,13 @@ fi
 
 echo -ne ${B}"Host header attack link pollution test"${NC}
 echo ''
-if curl -s -k -m 2 -A "$user_agent" -H "Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -m "$t_o" -A "$user_agent" -H "Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -m 2 -A "$user_agent" -H 'Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -m "$t_o" -A "$user_agent" -H 'Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -m 2 -A "$user_agent" -H "Host: evil.com" "$dom"
+curl -s -k -m "$t_o" -A "$user_agent" -H "Host: evil.com" "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -251,13 +254,13 @@ fi
 
 echo -ne ${B}"Host Header attack header test"${NC}
 echo ''
-if curl -s -k -I -m 2 -A "$user_agent" -H "Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -I -m "$t_o" -A "$user_agent" -H "Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -I -m 2 -A "$user_agent" -H 'Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -I -m "$t_o" -A "$user_agent" -H 'Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -I -m 2 -A "$user_agent" -H "Host: evil.com" "$dom" 
+curl -s -k -I -m "$t_o" -A "$user_agent" -H "Host: evil.com" "$dom" 
 else
 echo -ne ${G}"Not Vulnerable"${NC}
 echo ''   
@@ -266,14 +269,14 @@ fi
 
 echo -ne ${B}"Trace method test (XST)"${NC}
 echo ''
-if curl -s -I -m 2 -A "$user_agent" -X TRACE "$dom" | grep -q '200 OK'
+if curl -s -I -m "$t_o" -A "$user_agent" -X TRACE "$dom" | grep -q '200 OK'
 then
 echo ''
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -I -m 2 -A "$user_agent" -X TRACE "$dom""${NC}
+echo -ne ${Y}"curl -s -I -m "$t_o" -A "$user_agent" -X TRACE "$dom""${NC}
 echo ''
-curl -s -I -m 2 -A "$user_agent" -X TRACE "$dom"
+curl -s -I -m "$t_o" -A "$user_agent" -X TRACE "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -287,23 +290,17 @@ main_man
 
 #Muggle Host_Header_Attack_Scan
 hha_msc () {
-read -r -p "Enter domain name {xyz.com}: " dom
-read -r -p "Enter Sub-domain name {www}: " sub
-if [ "$sub" = '' ]; then
-sub=''
-else
-subdot=$(echo -ne $sub.)
-fi
-
+echo -ne "Enter domain name {${Y}www.xyz.com${NC}}: "
+read -r dom
 echo -ne ${B}"X-Forwaded-Host link pollution test"${NC}
 echo ''
-if curl -s -k -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$subdot$dom" | grep -q 'evil'
+if curl -s -k -m "$t_o" -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -m 2 -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$subdot$dom""${NC}
+echo -ne ${Y}"curl -s -k -m "$t_o" -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$subdot$dom"
+curl -s -k -m "$t_o" -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -313,14 +310,14 @@ fi
 
 echo -ne ${B}"X-Forwaded-Host header test"${NC}
 echo ''
-if curl -s -k -I -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$subdot$dom" | grep -q 'evil'
+if curl -s -k -I -m "$t_o" -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo ''
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -I -m 2 -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$subdot$dom""${NC}
+echo -ne ${Y}"curl -s -k -I -m "$t_o" -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -I -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$subdot$dom"
+curl -s -k -I -m "$t_o" -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -330,13 +327,13 @@ fi
 
 echo -ne ${B}"Host header attack link pollution test"${NC}
 echo ''
-if curl -s -k -m 2 -A "$user_agent" -H "Host: evil.com" "$subdot$dom" | grep -q 'evil'
+if curl -s -k -m "$t_o" -A "$user_agent" -H "Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -m 2 -A "$user_agent" -H 'Host: evil.com' "$subdot$dom""${NC}
+echo -ne ${Y}"curl -s -k -m "$t_o" -A "$user_agent" -H 'Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -m 2 -A "$user_agent" -H "Host: evil.com" "$subdot$dom"
+curl -s -k -m "$t_o" -A "$user_agent" -H "Host: evil.com" "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -346,13 +343,13 @@ fi
 
 echo -ne ${B}"Host Header attack header test"${NC}
 echo ''
-if curl -s -k -I -m 2 -A "$user_agent" -H "Host: evil.com" "$subdot$dom" | grep -q 'evil'
+if curl -s -k -I -m "$t_o" -A "$user_agent" -H "Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -I -m 2 -A "$user_agent" -H 'Host: evil.com' "$subdot$dom""${NC}
+echo -ne ${Y}"curl -s -k -I -m "$t_o" -A "$user_agent" -H 'Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -I -m 2 -A "$user_agent" -H "Host: evil.com" "$subdot$dom" 
+curl -s -k -I -m "$t_o" -A "$user_agent" -H "Host: evil.com" "$dom" 
 else
 echo -ne ${G}"Not Vulnerable"${NC}
 echo ''   
@@ -360,14 +357,14 @@ fi
 
 echo -ne ${B}"Trace method test (XST)"${NC}
 echo ''
-if curl -s -I -m 2 -A "$user_agent" -X TRACE "$subdot$dom" | grep -q '200 OK'
+if curl -s -I -m "$t_o" -A "$user_agent" -X TRACE "$dom" | grep -q '200 OK'
 then
 echo ''
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -I -m 2 -A "$user_agent" -X TRACE "$subdot$dom""${NC}
+echo -ne ${Y}"curl -s -I -m "$t_o" -A "$user_agent" -X TRACE "$dom""${NC}
 echo ''
-curl -s -I -m 2 -A "$user_agent" -X TRACE "$subdot$dom"
+curl -s -I -m "$t_o" -A "$user_agent" -X TRACE "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -381,7 +378,7 @@ main_man
 #Host_header_lists belong to me
 hha_mli () {
 
-echo -ne "Enter custom subdomain list location [/path/to/my/list.txt]: "
+echo -ne "Enter custom subdomain list location [${Y}/path/to/my/list.txt${NC}]: "
 read -r  culist
 if [ ! -f "$culist" ]; then
 echo -ne ${R}"File not found!\\n"${NC}
@@ -394,13 +391,13 @@ echo -ne ${Y}" Testing "$dom" "${NC}
 echo ''
 echo -ne ${B}"X-Forwaded-Host link pollution test"${NC}
 echo ''
-if curl -s -k -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -m "$t_o" -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -m 2 -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -m "$t_o" -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom"
+curl -s -k -m "$t_o" -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -410,14 +407,14 @@ fi
 
 echo -ne ${B}"X-Forwaded-Host header test"${NC}
 echo ''
-if curl -s -k -I -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -I -m "$t_o" -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo ''
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -I -m 2 -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -I -m "$t_o" -A "$user_agent" -H 'X-Forwarded-Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -I -m 2 -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom"
+curl -s -k -I -m "$t_o" -A "$user_agent" -H "X-Forwarded-Host: evil.com" "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -427,13 +424,13 @@ fi
 
 echo -ne ${B}"Host header attack link pollution test"${NC}
 echo ''
-if curl -s -k -m 2 -A "$user_agent" -H "Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -m "$t_o" -A "$user_agent" -H "Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -m 2 -A "$user_agent" -H 'Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -m "$t_o" -A "$user_agent" -H 'Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -m 2 -A "$user_agent" -H "Host: evil.com" "$dom"
+curl -s -k -m "$t_o" -A "$user_agent" -H "Host: evil.com" "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -442,13 +439,13 @@ fi
 
 echo -ne ${B}"Host Header attack header test"${NC}
 echo ''
-if curl -s -k -I -m 2 -A "$user_agent" -H "Host: evil.com" "$dom" | grep -q 'evil'
+if curl -s -k -I -m "$t_o" -A "$user_agent" -H "Host: evil.com" "$dom" | grep -q 'evil'
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -k -I -m 2 -A "$user_agent" -H 'Host: evil.com' "$dom""${NC}
+echo -ne ${Y}"curl -s -k -I -m "$t_o" -A "$user_agent" -H 'Host: evil.com' "$dom""${NC}
 echo ''
-curl -s -k -I -m 2 -A "$user_agent" -H "Host: evil.com" "$dom" 
+curl -s -k -I -m "$t_o" -A "$user_agent" -H "Host: evil.com" "$dom" 
 else
 echo -ne ${G}"Not Vulnerable"${NC}
 echo ''   
@@ -457,14 +454,14 @@ fi
 
 echo -ne ${B}"Trace method test (XST)"${NC}
 echo ''
-if curl -s -I -m 2 -A "$user_agent" -X TRACE "$dom" | grep -q '200 OK'
+if curl -s -I -m "$t_o" -A "$user_agent" -X TRACE "$dom" | grep -q '200 OK'
 then
 echo ''
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}"curl -s -I -m 2 -A "$user_agent" -X TRACE "$dom""${NC}
+echo -ne ${Y}"curl -s -I -m "$t_o" -A "$user_agent" -X TRACE "$dom""${NC}
 echo ''
-curl -s -I -m 2 -A "$user_agent" -X TRACE "$dom"
+curl -s -I -m "$t_o" -A "$user_agent" -X TRACE "$dom"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -480,7 +477,7 @@ fi
 # CRLF_Injection_Scan_Selection
 crlf_s () {
 clear
-echo -ne "${Y}[1]${NC} CRLF Injection Scan (Located subdomains)\\n${Y}[2]${NC} CRLF Injection Scan (Manual Single) \\n${Y}[3]${NC} CRLF Injection Scan (Manual List) \\n${Y}[4]${NC} Go back to menu \\nChoose scan option [1-4]: "
+echo -ne "${Y}[1]${NC} CRLF Injection Scan (Located subdomains)\\n${Y}[2]${NC} CRLF Injection Scan (Manual Single) \\n${Y}[3]${NC} CRLF Injection Scan (Manual List) \\n${Y}[4]${NC} Go back to menu \\nChoose scan option ${Y}[1-4]${NC}: "
 read -r sel
 if [ "$sel" = '1' ]; then
 crlf_asc
@@ -507,13 +504,13 @@ echo -ne ${Y}" Testing "$dom" "${NC}
 echo ''
 echo -ne ${B}"CRLF injection test"${NC}
 echo ''
-if curl -s -k -I -m 2 -A "$user_agent" "$dom/%0d%0acustom_header:so_evil" | grep -q "\<custom_header: so_evil\>\|\<custom_header:so_evil\>"
+if curl -s -k -I -m "$t_o" -A "$user_agent" "$dom/%0d%0acustom_header:so_evil" | grep -q "\<custom_header: so_evil\>\|\<custom_header:so_evil\>"
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}curl -I -s -k -m 2 -A "$user_agent" "$dom/%0d%0aCustom_Header:so_evil"${NC}
+echo -ne ${Y}curl -I -s -k -m "$t_o" -A "$user_agent" "$dom/%0d%0aCustom_Header:so_evil"${NC}
 echo ''
-curl -I -s -k -m 2 -A "$user_agent" "$dom/%0d%0aCustom_Header:so_evil"
+curl -I -s -k -m "$t_o" -A "$user_agent" "$dom/%0d%0aCustom_Header:so_evil"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -528,23 +525,17 @@ main_man
 
 # Muggle_CRLF_Injection_module
 crlf_msc () {
-read -r -p "Enter domain name {xyz.com}: " dom
-read -r -p "Enter Sub-domain name {www}: " sub
-if [ "$sub" = '' ]; then
-sub=''
-else
-subdot=$(echo -ne $sub.)
-fi
-
+echo -ne "Enter domain name {${Y}www.xyz.com${NC}}: "
+read -r dom
 echo -ne ${B}"CRLF injection test"${NC}
 echo ''
-if curl -I -s -k -m 2 -A "$user_agent" "$subdot$dom/%0d%0acustom_header:so_evil" | grep -q "\<custom_header: so_evil\>\|\<custom_header:so_evil\>"
+if curl -I -s -k -m "$t_o" -A "$user_agent" "$dom/%0d%0acustom_header:so_evil" | grep -q "\<custom_header: so_evil\>\|\<custom_header:so_evil\>"
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}curl -I -s -k -m 2 -A "$user_agent" "$subdot$dom/%0d%0aCustom_Header:so_evil"${NC}
+echo -ne ${Y}curl -I -s -k -m "$t_o" -A "$user_agent" "$dom/%0d%0aCustom_Header:so_evil"${NC}
 echo ''
-curl -I -s -k -m 2 -A "$user_agent" "$subdot$dom/%0d%0aCustom_Header:so_evil"
+curl -I -s -k -m "$t_o" -A "$user_agent" "$dom/%0d%0aCustom_Header:so_evil"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -559,7 +550,7 @@ main_man
 #Me_list_Crlf
 crlf_mli () {
 
-echo -ne "Enter custom subdomain list location [/path/to/my/list.txt]: "
+echo -ne "Enter custom subdomain list location [${Y}/path/to/my/list.txt${NC}]: "
 read -r  culist
 if [ ! -f "$culist" ]; then
 echo -ne ${R}"File not found!\\n"${NC}
@@ -572,13 +563,13 @@ echo -ne ${Y}" Testing "$dom" "${NC}
 echo ''
 echo -ne ${B}"CRLF injection test"${NC}
 echo ''
-if curl -s -k -I -m 2 -A "$user_agent" "$dom/%0d%0acustom_header:so_evil" | grep -q "\<custom_header: so_evil\>\|\<custom_header:so_evil\>"
+if curl -s -k -I -m "$t_o" -A "$user_agent" "$dom/%0d%0acustom_header:so_evil" | grep -q "\<custom_header: so_evil\>\|\<custom_header:so_evil\>"
 then
 echo -ne ${R}"Vulnerable"${NC}
 echo ''
-echo -ne ${Y}curl -I -s -k -m 2 -A "$user_agent" "$dom/%0d%0aCustom_Header:so_evil"${NC}
+echo -ne ${Y}curl -I -s -k -m "$t_o" -A "$user_agent" "$dom/%0d%0aCustom_Header:so_evil"${NC}
 echo ''
-curl -I -s -k -m 2 -A "$user_agent" "$dom/%0d%0aCustom_Header:so_evil"
+curl -I -s -k -m "$t_o" -A "$user_agent" "$dom/%0d%0aCustom_Header:so_evil"
 echo ''
 else
 echo -ne ${G}"Not Vulnerable"${NC}
@@ -595,18 +586,12 @@ fi
 
 #OPTION_BLEED_SCAN {EXPERIMENTAL} (https://blog.fuzzing-project.org/60-Optionsbleed-HTTP-OPTIONS-method-can-leak-Apaches-server-memory.html)
 op_bl () {
-read -r -p "Enter domain name {xyz.com}: " dom
-read -r -p "Enter Sub-domain name {www}: " sub
-if [ "$sub" = '' ]; then
-sub=''
-else
-subdot=$(echo -ne $sub.)
-fi
-
+echo -ne "Enter domain name {${Y}www.xyz.com${NC}}: "
+read -r dom
 echo -ne ${B}"Option Bleed test experimental"${NC}
 echo ''
 
-for i in {1..100}; do curl -sI -A "$user_agent" -X OPTIONS $subdot$dom/|grep -i "allow:"; done
+for i in {1..100}; do curl -sI -m "$t_o" -A "$user_agent" -X OPTIONS $dom/|grep -i "allow:"; done
 
 sleep 5
 echo ''
@@ -617,18 +602,60 @@ main_man
 
 #Adjusting_Scanning_Options_because_not_everybody_is_a_fan_of_curl
 sc_op () {
-echo "Current User-Agent $user_agent"
-read -r -p "Would you like to change that? {Y|N}: " agask
-if [ "$agask" == "N" ] || [ "$agask" == "n" ]; then
-main_man
-elif [ $agask == "Y" ] || [ $agask == "y" ]; then
-read -r -p "Please enter your custom User-Agent: " user_agent
-echo -ne ${G}"New User-Agent $user_agent"
-sleep 3
+clear
+echo -ne "${Y}[1]${NC} Change User-Agent \\n${Y}[2]${NC} Change request Time-out time \\n${Y}[3]${NC} Go back to menu \\nChoose scan option ${Y}[1-3]${NC}: "
+read -r sel
+
+if [ "$sel" = '1' ]; then
+ch_ua
+elif [ "$sel" = '2' ]; then
+ch_to
+elif [ "$sel" = '3' ]; then
 main_man
 else
-echo -ne ${R}"Wrong entry please use {Y or N}\\n"${NC}
+echo -ne ${RB}${UW}"\"$sel\"${NC} is not a valid choice"
+sleep 2
 sc_op
+fi
+}
+
+#User_agent_man
+ch_ua () {
+echo -ne "Current User-Agent: ${G} $user_agent ${NC} \\n"
+echo -ne "Would you like to change that? ${Y}{Y|N}${NC}: " 
+read -r agask
+if [ "$agask" == "N" ] || [ "$agask" == "n" ]; then
+sc_op
+elif [ $agask == "Y" ] || [ $agask == "y" ]; then
+read -r -p "Please enter your custom User-Agent: " user_agent
+echo -ne "New User-Agent: ${G} $user_agent ${NC} \\n"
+sleep 3
+sc_op
+else
+echo -ne ${R}"Wrong entry please use {Y or N}\\n"${NC}
+ch_ua
+#yay
+fi
+clear
+}
+
+#it's_TIME
+ch_to () {
+echo -ne "Current Time out time: ${G} $t_o Second ${NC} \\n"
+echo -ne "Would you like to change that? ${Y}{Y|N}${NC}: " 
+read -r agask
+if [ "$agask" == "N" ] || [ "$agask" == "n" ]; then
+sc_op
+elif [ $agask == "Y" ] || [ $agask == "y" ]; then
+echo -ne "${R}Note:${NC}\\n${Y}More time means best results at slow speed \\nless time means unreliable results at fast speed. \\n"${NC}
+echo ''
+read -r -p "Please enter new Time out time in Seconds: " t_o
+echo -ne "New Time out is ${G}$t_o ${NC}seconds"
+sleep 3
+sc_op
+else
+echo -ne ${R}"Wrong entry please use {Y or N}\\n"${NC}
+ch_to
 fi
 clear
 }
@@ -652,7 +679,7 @@ echo -ne "
                              
        ${G}SADA${NC} created as fun project to support web vulnerability scanning.
             Valuable feedback and suggestions are always welcome 
-                 @ ${R}mtk_911@yahoo.com${NC} or ${R}http://fb.com/MTK911${NC}"
+                 @ ${R}root@mtk911.cf${NC} or ${R}http://fb.com/MTK911${NC}"
 
 echo ""
 echo ""
@@ -665,8 +692,8 @@ main_man
 
 #Emergency exit here
 sh_exit () {
-
-read -r -p "Do you want to save Located subdomains?[y|n]: " ask
+echo -ne "Do you want to save Located subdomains${Y}[y|n]${NC}: "
+read -r ask
 if [ "$ask" == "N" ] || [ "$ask" == "n" ]; then
 echo '' > subdomains
 elif [ $ask == "Y" ] || [ $ask == "y" ]; then
@@ -677,17 +704,17 @@ echo -ne ${R}"Wrong entry please use {Y or N}\\n"${NC}
 sh_exit
 fi
 clear
-echo -ne "        Bringing simplicity back"
+echo "        Bringing simplicity back"
 echo -ne "
 ##~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#
 #                                        #
 #    SADA Web Application Testing tool   #
-#             Written by MTK             #
-#               Ver {"$ver"}                #
+#             Written by ${LG}MTK${NC}             #
+#               Ver {${Y}"$ver"${NC}}                #
 #----------------------------------------#
 #     Created by Open Source shared      #
 #            as Open source              #
-#    www.mtk911.cf | mtk_911@yahoo.com	 #
+#    ${R}www.mtk911.cf${NC} | ${R}root[at]mtk911.cf${NC}   #
 #                                        #
 #~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~##
 
