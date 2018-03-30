@@ -1,0 +1,13 @@
+/evil.com/
+//evil.com/
+///evil.com/
+////evil.com/
+/////evil.com/
+/////evil.com
+//evil.com/%2f..
+///evil.com/%2f..
+////evil.com/%2f..
+https://evil.com/%2f..
+/https://evil.com/%2f..
+http://evil.com/%2f..
+//evil.com/%2f%2e%2e

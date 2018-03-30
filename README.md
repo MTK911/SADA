@@ -62,3 +62,8 @@ This software/script/application/thing is provided as is, without warranty of an
 + Custom timeout
 + Beautified
 + HTTPS support added (partial)
+
+### Ver 0.7
++ WAF detetion on host header results
++ Open Redirect Scan added
++ Stupid fixes

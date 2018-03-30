@@ -1,5 +1,6 @@
-+ CloudFlare || Cloudfront de
 + Vulnerable Domain GE
-+ Parameter
 + XSS
 + Anatomy
++ Open Redirect
++ Brute subdom
++ File/Dir scan
