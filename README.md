@@ -67,3 +67,8 @@ This software/script/application/thing is provided as is, without warranty of an
 + WAF detetion on host header results
 + Open Redirect Scan added
 + Stupid fixes
++ Scan optimization
+
+### Ver 0.8
++ Proxy support added
++ Subdomain Bruteforce scan added
